@@ -1,0 +1,14 @@
+apiVersion: v1                       # Kubernetes API version for basic resources like Service
+kind: Service                        # Resource type: Service exposes Pods to the network
+metadata:
+  name: kubernetes-demo-api-service # Name of the Service
+  labels:
+    app: kubernetes-demo-api       # Labels to identify the Service
+spec:
+  selector:
+    app: kubernetes-demo-api        # Match Pods with this label (connects Service to Deployment Pods)
+  ports:
+    - protocol: TCP                   # Use TCP protocol for communication
+      port: 3000                      # Service port (external port exposed by the Service)
+      targetPort: 3000                # Container port inside the Pod to forward traffic to
+  type: NodePort                      # Service type: exposes port on each Node (use LoadBalancer in cloud)

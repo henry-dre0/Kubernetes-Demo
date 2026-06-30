@@ -1,0 +1,48 @@
+apiVersion: apps/v1              # Kubernetes API version for Deployments
+kind: Deployment                 # Resource type: Deployment manages Pods
+metadata:
+  name: kubernetes-demo-api       # Name of the Deployment
+  labels:
+    app: kubernetes-demo-api      # Labels to identify this Deployment
+spec:
+  replicas: 2                     # Run 2 replicas (Pods) of this app
+  selector:
+    matchLabels:
+      app: kubernetes-demo-api    # Match Pods with this label
+  template:                       # Pod template (blueprint for Pods)
+    metadata:
+      labels:
+        app: kubernetes-demo-api  # Labels applied to Pods created by this Deployment
+    spec:
+      containers:
+        - name: kubernetes-demo-api   # Name of the container inside the Pod
+          image: henrydre/kubernetes-demo-api:latest  # Container image to run
+          imagePullPolicy: Always  # Always pull the latest image (useful for development)
+          ports:
+            - containerPort: 3000     # Expose port 3000 inside the container
+          env:                        # Environment variables for the container
+            - name: NODE_ENV
+              value: "production"     # Set NODE_ENV=production
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name  # Inject Pod’s own name into POD_NAME
+          resources:                  # Resource requests and limits
+            requests:
+              cpu: "100m"             # Minimum CPU requested (0.1 core)
+              memory: "128Mi"         # Minimum memory requested
+            limits:
+              cpu: "500m"             # Max CPU allowed (0.5 core)
+              memory: "512Mi"         # Max memory allowed
+          readinessProbe:             # Probe to check if app is ready to serve traffic
+            httpGet:
+              path: /readyz           # Endpoint to call for readiness
+              port: 3000
+            initialDelaySeconds: 5    # Wait 5s before first probe
+            periodSeconds: 10         # Probe every 10s
+          livenessProbe:              # Probe to check if app is alive
+            httpGet:
+              path: /healthz          # Endpoint to call for liveness
+              port: 3000
+            initialDelaySeconds: 10   # Wait 10s before first probe
+            periodSeconds: 20         # Probe every 20s

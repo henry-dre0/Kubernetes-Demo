@@ -1,0 +1,14 @@
+services:                # Top-level key: defines all the containers (services) in this setup
+  api:                   # Name of the service (your Node.js API app)
+    build:               # Instructions for building the Docker image
+      context: .         # Use the current directory as the build context (where Dockerfile and source code live)
+      dockerfile: Dockerfile  # Explicitly specify the Dockerfile to use
+    container_name: node-api   # Name to give the running container (instead of a random auto-generated one)
+    ports:
+      - "3000:3000"      # Map host port 3000 to container port 3000 (so you can access the app via localhost:3000)
+    environment:
+      NODE_ENV: production   # Set environment variable inside the container (here, production mode)
+    volumes:
+      - .:/app           # Mount the current directory into /app inside the container (live code sync)
+      - /app/node_modules   # Anonymous volume to prevent overwriting node_modules inside the container
+    command: npm run dev # Override the default CMD in Dockerfile; run `npm run dev` when the container starts
